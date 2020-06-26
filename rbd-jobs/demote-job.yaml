@@ -1,0 +1,54 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: demote-job
+  namespace: rook-ceph
+  labels:
+    app: ceph-toolbox-job
+spec:
+  template:
+    spec:
+      initContainers:
+      - name: config-init
+        # image: rook/ceph:master
+        image: quay.io/rcook/storage-rehost:toolbox
+        # command: ["/usr/local/bin/toolbox.sh"]
+        # args: ["--skip-watch"]
+        command: ["/tini"]
+        args: ["-g", "-s", "--", "/usr/local/bin/toolbox.sh", "--skip-watch"]
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: ROOK_ADMIN_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: rook-ceph-mon
+              key: admin-secret
+        volumeMounts:
+        - mountPath: /etc/ceph
+          name: ceph-config
+        - name: mon-endpoint-volume
+          mountPath: /etc/rook
+      containers:
+      - name: script
+        # image: rook/ceph:master
+        image: quay.io/rcook/storage-rehost:toolbox
+        volumeMounts:
+        - mountPath: /etc/ceph
+          name: ceph-config
+          readOnly: true
+        command:
+        - "bash"
+        - "-c"
+        - |
+          rbd mirror image demote scottpool1/mysql-pv-claim-wordpress1c24c522-b721-11ea-a18a-0a580a81021b
+          rbd mirror image demote scottpool1/wp-pv-claim-wordpress1c261d50-b721-11ea-a18a-0a580a81021b
+      volumes:
+      - name: mon-endpoint-volume
+        configMap:
+          name: rook-ceph-mon-endpoints
+          items:
+          - key: data
+            path: mon-endpoints
+      - name: ceph-config
+        emptyDir: {}
+      restartPolicy: Never
