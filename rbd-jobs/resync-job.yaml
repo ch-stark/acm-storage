@@ -10,10 +10,7 @@ spec:
     spec:
       initContainers:
       - name: config-init
-        # image: rook/ceph:master
         image: quay.io/rcook/storage-rehost:toolbox
-        # command: ["/usr/local/bin/toolbox.sh"]
-        # args: ["--skip-watch"]
         command: ["/tini"]
         args: ["-g", "-s", "--", "/usr/local/bin/toolbox.sh", "--skip-watch"]
         imagePullPolicy: IfNotPresent
@@ -30,7 +27,6 @@ spec:
           mountPath: /etc/rook
       containers:
       - name: script
-        # image: rook/ceph:master
         image: quay.io/rcook/storage-rehost:toolbox
         volumeMounts:
         - mountPath: /etc/ceph
