@@ -1,7 +1,7 @@
 apiVersion: apps.open-cluster-management.io/v1
 kind: Subscription
 metadata:
-  name: acm-storage-subscription
+  name: acm-job-subscription
   namespace: wordpress
   labels:
     name: east1
