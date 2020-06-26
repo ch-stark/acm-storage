@@ -6,6 +6,7 @@ metadata:
   labels:
     app: ceph-toolbox-job
 spec:
+  ttlSecondsAfterFinished: 100
   template:
     spec:
       initContainers:
@@ -36,8 +37,8 @@ spec:
         - "bash"
         - "-c"
         - |
-          rbd mirror image demote scottpool1/mysql-pv-claim-wordpress1c24c522-b721-11ea-a18a-0a580a81021b
-          rbd mirror image demote scottpool1/wp-pv-claim-wordpress1c261d50-b721-11ea-a18a-0a580a81021b
+          rbd mirror image demote scottpool2/mysql-pv-claim-wordpressa39eaf9c-b7d2-11ea-979b-0a580a800231
+          rbd mirror image demote scottpool2/wp-pv-claim-wordpressa3a5aef3-b7d2-11ea-979b-0a580a800231
       volumes:
       - name: mon-endpoint-volume
         configMap:
