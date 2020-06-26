@@ -6,11 +6,11 @@ metadata:
   labels:
     name: east1
   annotations:
-    apps.open-cluster-management.io/github-path: application/wordpress/overlays/east1
+    apps.open-cluster-management.io/github-path: application/wordpress
     apps.open-cluster-management.io/github-branch: master
 spec:
   channel: wordpress/acm-storage
   placement:
     placementRef:
       kind: PlacementRule
-      name: blog-east1
+      name: blog
