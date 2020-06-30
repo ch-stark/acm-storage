@@ -64,7 +64,7 @@ spec:
           if [[ $valued1 == *"image is primary"* ]]; then
             echo "is primary - do the demote"
             rbd mirror image demote $image1
-            demoted2=Y
+            demoted1=Y
           else
             echo "not primary - do not demote"            
           fi
