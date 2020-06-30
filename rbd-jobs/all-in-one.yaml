@@ -37,55 +37,63 @@ spec:
         - "-c"
         - |
           # Job functions
+          image1=scottpool2/wp-pv-claim-wordpressa3a5aef3-b7d2-11ea-979b-0a580a800231
+          image2=scottpool2/mysql-pv-claim-wordpressa39eaf9c-b7d2-11ea-979b-0a580a800231
+          demoted="N"
           
           # Resync
-          valuer1=$( rbd mirror image status scottpool2/wp-pv-claim-wordpressa3a5aef3-b7d2-11ea-979b-0a580a800231 | head -4 | tail -1 )
+          valuer1=$( rbd mirror image status $image1 | head -4 | tail -1 )
           if [[ $valuer1 == *"image is primary"* ]]; then
             echo "is primary - do not resync"
           else
             echo "not primary - resync image"
-            rbd mirror image resync scottpool2/wp-pv-claim-wordpressa3a5aef3-b7d2-11ea-979b-0a580a800231
+            rbd mirror image resync $image1
           fi
           
-          valuer2=$( rbd mirror image status scottpool2/mysql-pv-claim-wordpressa39eaf9c-b7d2-11ea-979b-0a580a800231 | head -4 | tail -1 )
+          valuer2=$( rbd mirror image status $image2 | head -4 | tail -1 )
           if [[ $valuer2 == *"image is primary"* ]]; then
             echo "is primary - do not resync"
           else
             echo "not primary - resync image"
-            rbd mirror image resync scottpool2/mysql-pv-claim-wordpressa39eaf9c-b7d2-11ea-979b-0a580a800231
+            rbd mirror image resync $image2
           fi
 
           # Check demote status
-          valued1=$( rbd mirror image status scottpool2/wp-pv-claim-wordpressa3a5aef3-b7d2-11ea-979b-0a580a800231 | head -4 | tail -1 )
+          valued1=$( rbd mirror image status $image1 | head -4 | tail -1 )
           if [[ $valued1 == *"image is primary"* ]]; then
             echo "is primary - do the demote"
-            rbd mirror image demote scottpool2/wp-pv-claim-wordpressa3a5aef3-b7d2-11ea-979b-0a580a800231
+            rbd mirror image demote $image1
+            demoted=Y
           else
             echo "not primary - do not demote"            
           fi
-          valued2=$( rbd mirror image status scottpool2/mysql-pv-claim-wordpressa39eaf9c-b7d2-11ea-979b-0a580a800231 | head -4 | tail -1 )
+          valued2=$( rbd mirror image status $image2 | head -4 | tail -1 )
           if [[ $valued2 == *"image is primary"* ]]; then
             echo "is primary - do the demote"
-            rbd mirror image demote scottpool2/mysql-pv-claim-wordpressa39eaf9c-b7d2-11ea-979b-0a580a800231
+            rbd mirror image demote $image2
+            demoted=Y
           else
             echo "not primary - do not demote"            
           fi
 
           # Check promote status
-          valuep1=$( rbd mirror image status scottpool2/wp-pv-claim-wordpressa3a5aef3-b7d2-11ea-979b-0a580a800231 | head -4 | tail -1 )
-          if [[ $valuep1 == *"image is primary"* ]]; then
-            echo "is primary - do not promote"
-          else
-            echo "not primary - promote image"
-            rbd mirror image promote scottpool2/wp-pv-claim-wordpressa3a5aef3-b7d2-11ea-979b-0a580a800231
-          fi
-          valuep2=$( rbd mirror image status scottpool2/mysql-pv-claim-wordpressa39eaf9c-b7d2-11ea-979b-0a580a800231 | head -4 | tail -1 )
-          if [[ $valuep2 == *"image is primary"* ]]; then
-            echo "is primary - do not promote"
-          else
-            echo "not primary - promote image"
-            rbd mirror image promote scottpool2/mysql-pv-claim-wordpressa39eaf9c-b7d2-11ea-979b-0a580a800231
-          fi
+          echo "Was image demoted? $demoted"
+          if [ $demoted == "N" ]; then
+            valuep1=$( rbd mirror image status $image1 | head -4 | tail -1 )
+            if [[ $valuep1 == *"image is primary"* ]]; then
+              echo "is primary - do not promote"
+            else
+              echo "not primary - promote image"
+              rbd mirror image promote $image1
+            fi
+            valuep2=$( rbd mirror image status $image2 | head -4 | tail -1 )
+            if [[ $valuep2 == *"image is primary"* ]]; then
+              echo "is primary - do not promote"
+            else
+              echo "not primary - promote image"
+              rbd mirror image promote $image2
+            fi
+          fi  
       volumes:
       - name: mon-endpoint-volume
         configMap:
