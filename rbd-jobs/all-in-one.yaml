@@ -1,0 +1,98 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: total-job
+  namespace: rook-ceph
+  labels:
+    app: ceph-toolbox-job
+spec:
+  template:
+    spec:
+      initContainers:
+      - name: config-init-total
+        image: quay.io/rcook/storage-rehost:toolbox
+        command: ["/tini"]
+        args: ["-g", "-s", "--", "/usr/local/bin/toolbox.sh", "--skip-watch"]
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: ROOK_ADMIN_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: rook-ceph-mon
+              key: admin-secret
+        volumeMounts:
+        - mountPath: /etc/ceph
+          name: ceph-config
+        - name: mon-endpoint-volume
+          mountPath: /etc/rook
+      containers:
+      - name: script-resync
+        image: quay.io/rcook/storage-rehost:toolbox
+        volumeMounts:
+        - mountPath: /etc/ceph
+          name: ceph-config
+          readOnly: true
+        command:
+        - "bash"
+        - "-c"
+        - |
+          # Job functions
+          
+          # Resync
+          valuer1=$( rbd mirror image status scottpool2/wp-pv-claim-wordpressa3a5aef3-b7d2-11ea-979b-0a580a800231 | head -4 | tail -1 )
+          if [[ $valuer1 == *"image is primary"* ]]; then
+            echo "is primary - do not resync"
+          else
+            echo "not primary - resync image"
+            rbd mirror image resync scottpool2/wp-pv-claim-wordpressa3a5aef3-b7d2-11ea-979b-0a580a800231
+          fi
+          
+          valuer2=$( rbd mirror image status scottpool2/mysql-pv-claim-wordpressa39eaf9c-b7d2-11ea-979b-0a580a800231 | head -4 | tail -1 )
+          if [[ $valuer2 == *"image is primary"* ]]; then
+            echo "is primary - do not resync"
+          else
+            echo "not primary - resync image"
+            rbd mirror image resync scottpool2/mysql-pv-claim-wordpressa39eaf9c-b7d2-11ea-979b-0a580a800231
+          fi
+
+          # Check demote status
+          valued1=$( rbd mirror image status scottpool2/wp-pv-claim-wordpressa3a5aef3-b7d2-11ea-979b-0a580a800231 | head -4 | tail -1 )
+          if [[ $valued1 == *"image is primary"* ]]; then
+            echo "is primary - do the demote"
+            rbd mirror image demote scottpool2/wp-pv-claim-wordpressa3a5aef3-b7d2-11ea-979b-0a580a800231
+          else
+            echo "not primary - do not demote"            
+          fi
+          valued2=$( rbd mirror image status scottpool2/mysql-pv-claim-wordpressa39eaf9c-b7d2-11ea-979b-0a580a800231 | head -4 | tail -1 )
+          if [[ $valued2 == *"image is primary"* ]]; then
+            echo "is primary - do the demote"
+            rbd mirror image demote scottpool2/mysql-pv-claim-wordpressa39eaf9c-b7d2-11ea-979b-0a580a800231
+          else
+            echo "not primary - do not demote"            
+          fi
+
+          # Check promote status
+          valuep1=$( rbd mirror image status scottpool2/wp-pv-claim-wordpressa3a5aef3-b7d2-11ea-979b-0a580a800231 | head -4 | tail -1 )
+          if [[ $valuep1 == *"image is primary"* ]]; then
+            echo "is primary - do not promote"
+          else
+            echo "not primary - promote image"
+            rbd mirror image promote scottpool2/wp-pv-claim-wordpressa3a5aef3-b7d2-11ea-979b-0a580a800231
+          fi
+          valuep2=$( rbd mirror image status scottpool2/mysql-pv-claim-wordpressa39eaf9c-b7d2-11ea-979b-0a580a800231 | head -4 | tail -1 )
+          if [[ $valuep2 == *"image is primary"* ]]; then
+            echo "is primary - do not promote"
+          else
+            echo "not primary - promote image"
+            rbd mirror image promote scottpool2/mysql-pv-claim-wordpressa39eaf9c-b7d2-11ea-979b-0a580a800231
+          fi
+      volumes:
+      - name: mon-endpoint-volume
+        configMap:
+          name: rook-ceph-mon-endpoints
+          items:
+          - key: data
+            path: mon-endpoints
+      - name: ceph-config
+        emptyDir: {}
+      restartPolicy: Never
