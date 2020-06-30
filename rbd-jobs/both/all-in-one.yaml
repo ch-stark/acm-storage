@@ -37,8 +37,8 @@ spec:
         - "-c"
         - |
           # Job functions
-          image1=scottpool2/mysql-pv-claim-wordpress385356c3-badd-11ea-bd87-0a580a83002e
-          image2=scottpool2/wp-pv-claim-wordpress3855ab5d-badd-11ea-bd87-0a580a83002e
+          image1=scottpool3/mysql-pv-claim-wordpresscdda8ab3-bb14-11ea-b6ae-0a580a870038
+          image2=scottpool3/wp-pv-claim-wordpresscde1cdbb-bb14-11ea-b6ae-0a580a870038
           demoted1="N"
           demoted2="N"
           
