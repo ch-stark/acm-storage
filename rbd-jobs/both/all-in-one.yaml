@@ -39,7 +39,8 @@ spec:
           # Job functions
           image1=scottpool2/wp-pv-claim-wordpressa3a5aef3-b7d2-11ea-979b-0a580a800231
           image2=scottpool2/mysql-pv-claim-wordpressa39eaf9c-b7d2-11ea-979b-0a580a800231
-          demoted="N"
+          demoted1="N"
+          demoted2="N"
           
           # Resync
           valuer1=$( rbd mirror image status $image1 | head -4 | tail -1 )
@@ -63,7 +64,7 @@ spec:
           if [[ $valued1 == *"image is primary"* ]]; then
             echo "is primary - do the demote"
             rbd mirror image demote $image1
-            demoted=Y
+            demoted2=Y
           else
             echo "not primary - do not demote"            
           fi
@@ -71,14 +72,14 @@ spec:
           if [[ $valued2 == *"image is primary"* ]]; then
             echo "is primary - do the demote"
             rbd mirror image demote $image2
-            demoted=Y
+            demoted2=Y
           else
             echo "not primary - do not demote"            
           fi
 
           # Check promote status
-          echo "Was image demoted? $demoted"
-          if [ $demoted == "N" ]; then
+          echo "Was image $image1 demoted? $demoted1"
+          if [ $demoted1 == "N" ]; then
             valuep1=$( rbd mirror image status $image1 | head -4 | tail -1 )
             if [[ $valuep1 == *"image is primary"* ]]; then
               echo "is primary - do not promote"
@@ -86,6 +87,9 @@ spec:
               echo "not primary - promote image"
               rbd mirror image promote $image1
             fi
+          fi
+          echo "Was image $image2 demoted? $demoted2"
+          if [ $demoted2 == "N" ]; then
             valuep2=$( rbd mirror image status $image2 | head -4 | tail -1 )
             if [[ $valuep2 == *"image is primary"* ]]; then
               echo "is primary - do not promote"
@@ -93,7 +97,7 @@ spec:
               echo "not primary - promote image"
               rbd mirror image promote $image2
             fi
-          fi  
+          fi
       volumes:
       - name: mon-endpoint-volume
         configMap:
