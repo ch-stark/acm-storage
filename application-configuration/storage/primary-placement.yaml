@@ -6,4 +6,5 @@ metadata:
 spec:
   clusterSelector:
     matchLabels:
-      name: "east1"
+      cloud: "Amazon"
+  clusterReplicas: 2
