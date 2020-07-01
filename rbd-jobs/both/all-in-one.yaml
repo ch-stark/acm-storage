@@ -59,8 +59,17 @@ spec:
             rbd mirror image resync $image2
           fi
 
+          # wait for images to come back clean
+          until rbd mirror image status $image1 | head -2 | tail -1 | grep -q "global_id:";
+          do
+            sleep 1;
+          done
+          until rbd mirror image status $image2 | head -2 | tail -1 | grep -q "global_id:";
+          do
+            sleep 1;
+          done          
+
           # Check demote status
-          sleep 5
           valued1=$( rbd mirror image status $image1 | head -4 | tail -1 )
           if [[ $valued1 == *"image is primary"* ]]; then
             echo "is primary - do the demote"
@@ -79,7 +88,7 @@ spec:
           fi
 
           # Check promote status
-          sleep 5
+          sleep 2
           echo "Was image $image1 demoted? $demoted1"
           if [ $demoted1 == "N" ]; then
             valuep1=$( rbd mirror image status $image1 | head -4 | tail -1 )
