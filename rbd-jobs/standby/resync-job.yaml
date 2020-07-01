@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: resync-job-1
+  name: resync-job-2
   namespace: rook-ceph
   labels:
     app: ceph-toolbox-job

@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: promote-job
+  name: promote-job-1
   namespace: rook-ceph
   labels:
     app: ceph-toolbox-job
