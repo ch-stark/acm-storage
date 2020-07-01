@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: demote-job-3
+  name: demote-job-4
   namespace: rook-ceph
   labels:
     app: ceph-toolbox-job
