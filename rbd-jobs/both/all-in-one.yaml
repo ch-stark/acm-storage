@@ -37,17 +37,17 @@ spec:
         - "-c"
         - |
           # Image List in Array - Edit this for your Pool and Images
-          declare -a arr=("scottpool4/mysql-pv-claim-wordpresse3330f81-bb9b-11ea-bd87-0a580a83002e" 
-                          "scottpool4/wp-pv-claim-wordpresse335727c-bb9b-11ea-bd87-0a580a83002e"
-                         )
+          # declare -a arr=("scottpool4/mysql-pv-claim-wordpresse3330f81-bb9b-11ea-bd87-0a580a83002e" 
+          #                "scottpool4/wp-pv-claim-wordpresse335727c-bb9b-11ea-bd87-0a580a83002e"
+          #               )
 
-          ## Read all images into an array for our pool
-          ## supplying the Pool only
-          # pool="scottpool4"
-          # arr=()
-          # while IFS= read -r line; do
-          #  arr+=( "$pool/$line" )
-          # done < <( rbd ls $pool )
+          # Read all images into an array for our pool
+          # supplying the Pool only
+          pool="scottpool2"
+          arr=()
+          while IFS= read -r line; do
+            arr+=( "$pool/$line" )
+          done < <( rbd ls $pool )
 
           # Wait for images to come back clean
           echo ""
