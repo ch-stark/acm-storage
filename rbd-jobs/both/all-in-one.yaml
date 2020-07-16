@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: total-job-2
+  name: total-job-3
   namespace: rook-ceph
   labels:
     app: ceph-toolbox-job
