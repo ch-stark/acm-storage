@@ -5,9 +5,8 @@ metadata:
   namespace: wordpress
 spec:
   clusterConditions:
-   - type: OK
+  - status: "True"
+    type: ManagedClusterConditionAvailable
   clusterSelector:
-    matchExpressions: []
-    matchLabels:
-      name: "east1"
-  clusterReplicas: 1
+    matchExpressions:
+    - {key: name, operator: In, values: ["east1"]}

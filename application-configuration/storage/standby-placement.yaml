@@ -5,9 +5,9 @@ metadata:
   namespace: rook-ceph
 spec:
   clusterConditions:
-   - type: OK
+  - status: "True"
+    type: ManagedClusterConditionAvailable
   clusterSelector:
-    matchExpressions: []
-    matchLabels:
-      name: "east2"
-  clusterReplicas: 1
+    matchExpressions:
+    - {key: environment, operator: In, values: ["east2"]}
+
